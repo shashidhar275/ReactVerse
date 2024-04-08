@@ -11,6 +11,8 @@ import { useState, useEffect } from 'react';
 import { format } from 'date-fns';
 import api from './api/posts';
 import EditPost from './EditPost';
+import useWindowSize from './hooks/useWindowSize';
+import useAxiosFetch from './hooks/useAxiosFetch';
 
 function App() {
     const [posts,setPosts] = useState([]);
@@ -22,26 +24,14 @@ function App() {
     const [editTitle,setEditTitle] = useState('');
     const [editBody,setEditBody] = useState('');
     const history = useHistory();
+    const { width } = useWindowSize();
 
+    const { data, fetchError, isLoading } = useAxiosFetch('http://localhost:3500/posts');
+    
     useEffect(()=>{
-      const fetchPosts = async ()=>{
-        try{
-          const response = await api.get('/posts');
-          setPosts(response.data);
-        }catch(err){
-          if(err.response){
-            //Not in the 200 response range(but we got response instance from the backend)
-            console.log(err.response.data);
-            console.log(err.response.status);
-            console.log(err.response.headers);
-          }else{
-            //if incase of any page not found error 
-            console.log(`Error: ${err.message}`);
-          } 
-        }
-      }
-      fetchPosts();
-    },[]);
+      setPosts(data);
+    },[data]);
+
 
     useEffect(()=>{
       const filteredResults = posts.filter(post =>//This one is little awkward that, we cannot put {} it will not get you the output
@@ -96,12 +86,12 @@ function App() {
 
   return (
     <div className="App">
-     <Header title="React JS Blog"/>
+     <Header title="React JS Blog" width={width}/>
      <Nav serach={search} setSearch={setSearch}/>
      {/* Inside of a switch is like a waterfall as soon as it matches with the path that's what it delivers*/}
      <Switch>
       <Route exact path="/">
-        <Home posts={searchResults}/>
+        <Home posts={searchResults} fetchError={fetchError} isLoading={isLoading}/>
       </Route>
       <Route exact path="/post">
         <NewPost handleSubmit={handleSubmit} postTitle={postTitle} setPostTitle={setPostTitle} postBody={postBody} setPostBody={setPostBody}/>
