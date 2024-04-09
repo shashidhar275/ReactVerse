@@ -1,12 +1,17 @@
 import React from 'react'
-import {useEffect} from 'react';
-import {useParams,Link} from 'react-router-dom';
+import {useState, useEffect, useContext} from 'react';
+import {useParams,Link,useHistory} from 'react-router-dom';
+import DataContext from './context/DataContext';
+import api from './api/posts';
+import { format } from 'date-fns';
 
-const EditPost = ({
-    posts, handleEdit, editTitle, setEditTitle, editBody, setEditBody
-}) => {
+const EditPost = () => {
+    const { posts, setPosts } = useContext(DataContext);
     const {id} = useParams();
     const post = posts.find(post => (post.id).toString() ===id);
+    const [editTitle,setEditTitle] = useState('');
+    const [editBody,setEditBody] = useState('');
+    const history= useHistory();
 
     useEffect(()=>{
         if(post){
@@ -14,6 +19,20 @@ const EditPost = ({
             setEditBody(post.body);
         }
     },[post,setEditTitle,setEditBody]);
+
+    const handleEdit = async(id)=>{
+        const datetime = format(new Date(), 'MMMM dd, yyyy pp')
+        const updatedPost = { id, title: editTitle, datetime, body: editBody };
+        try{
+          const response = await api.put(`/posts/${id}`,updatedPost);//Now we use put.. we could use patch if we are updating specific fields ..Here we are essentially be replacing the entire post
+          setPosts(posts.map(post => (post.id).toString() === id ? response.data: post));
+          setEditTitle('');
+          setEditBody('');
+          history.push('/');
+        }catch(err){
+          console.log(`Error: ${err.message}`);//We can further extend this as mentioned above in useEffect of fetching the data(error part)
+        }
+      }
 
   return (
     <main className='NewPost'>

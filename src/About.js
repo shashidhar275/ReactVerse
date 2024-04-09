@@ -5,7 +5,7 @@ const About = () => {
     <main className='About'>
         <h2>About</h2>
         <p style={{ marginTop: "1rem"}}>
-          React Blog app project🥵...
+          React Blog app project🥵🥵🥵🥵...
         </p>
     </main>
   )

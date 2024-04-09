@@ -1,7 +1,10 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
+import { useContext } from 'react';
+import DataContext from './context/DataContext';
 
-const Nav = ({ search,setSearch }) => {
+const Nav = () => {
+  const { search,setSearch } = useContext(DataContext);
   /*htmlFor attribute of label element should be same as id of the specified input element*/
   return (
     <nav className='Nav'>
