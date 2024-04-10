@@ -1,24 +1,17 @@
 import React from 'react'
 import { useParams, Link, useHistory} from 'react-router-dom'
-import { useContext } from 'react';
-import DataContext from './context/DataContext';
-import api from './api/posts'
+import { useStoreState, useStoreActions } from 'easy-peasy';
 
 const PostPage = () => {
-  const {posts, setPosts} = useContext(DataContext);
   const {id} = useParams();
-  const post = posts.find(post => (post.id).toString() === id);
   const history = useHistory(); 
+  const deletePost = useStoreActions((actions) => actions.deletePost);
+  const getPostById = useStoreState((state) => state.getPostById);
+  const post = getPostById(id);
 
-  const handleDelete = async(id)=>{
-    try{
-      await api.delete(`/posts/${id}`);
-      const postsList = posts.filter(post => post.id!==id);
-      setPosts(postsList);
-      history.push('/');//User in the page that is been called for deletion hence to move from that page we use the hook useHistroy from react
-    }catch(err){
-      console.log(`Error: ${err.message}`);
-    }
+  const handleDelete = (id)=>{
+    deletePost(id);
+    history.push('/');
   }
 
   return (
